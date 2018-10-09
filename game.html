@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<head>
+  <title>Snake</title>
+  <script>
+    var speed = 1;
+    var intervalId;
+    window.onload = () => {
+      var cn = document.getElementById('main');
+      ctx = cn.getContext("2d");
+      document.addEventListener('keydown', arrow);
+      intervalId = setInterval(game, 20 * speed);
+    }
+    reset = () => {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, 400, 400);
+    }
+    var x = 0;
+    var y = 0;
+    var directX = 1;
+    var directY = 0;
+    var targetX = 8;
+    var targetY = 8;
+    var snake = [];
+    var length = 4;
+
+    draw = (_x, _y, _color) => {
+      ctx.fillStyle = _color;
+      ctx.fillRect(_x*25, _y*25, 23, 23);
+    }
+
+    game = () => {
+      reset();
+      x = x + directX;
+      y = y + directY;
+      var xPos = (x%16 + 16)%16;
+      var yPos = (y%16 + 16)%16;
+      snake.push({x: xPos, y: yPos});
+      if (snake.length > length) {
+        snake.shift();
+      }
+      for(let i = 0; i< snake.length; i++) {
+        draw(snake[i].x, snake[i].y, 'lime');
+        if (i < snake.length - 1 && snake[i].x === xPos && snake[i].y === yPos) {
+          length = 4;
+          snake = [];
+        }
+      }
+      if (xPos === targetX && yPos === targetY) {
+        length++;
+        targetX = Math.floor(Math.random()*16);
+        targetY = Math.floor(Math.random()*16);
+      }
+      draw(targetX, targetY, 'red');
+    }
+
+    updateInterval = () => {
+      clearInterval(intervalId);
+      intervalId = setInterval(game, 20 * speed);
+    }
+
+    arrow = (e) => {
+      switch(e.keyCode) {
+        case 37: directX = directX || -1; directY = 0; break;
+        case 38: directX = 0; directY = directY || -1; break;
+        case 39: directX = directX || 1; directY = 0; break;
+        case 40: directX = 0; directY = directY || 1; break;
+        case 68: speed = speed < 11 ? speed + 1 : speed; updateInterval(); break;
+        case 85: speed = speed > 1 ? speed - 1 : speed; updateInterval(); break;
+        default: break;
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="main" width="400" height="400" />
+</body>
